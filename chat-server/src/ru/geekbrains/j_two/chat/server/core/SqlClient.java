@@ -52,6 +52,8 @@ public class SqlClient {
 
     public static void disconnect() {
         try {
+            updateStatement.close();
+            getNickStatement.close();
             connection.close();
         } catch (SQLException throwables) {
             throw new RuntimeException(throwables);

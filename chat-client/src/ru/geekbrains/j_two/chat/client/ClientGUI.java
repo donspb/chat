@@ -8,16 +8,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-
-import static java.lang.Thread.sleep;
 
 public class ClientGUI extends JFrame implements ActionListener, Thread.UncaughtExceptionHandler, SocketThreadListener {
 
@@ -115,6 +110,14 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             setAlwaysOnTop(cbAlwaysOnTop.isSelected());
         }
         else if (src == btnLogin) {
+            String oldLines = null;
+            try {
+                oldLines = LogFilesControl.getSomeLines(tfLogin.getText());
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+            if (oldLines != null ) log.append(oldLines);
+
             connect();
         }
         else if (src == btnSend || src == tfMessage) {
@@ -157,6 +160,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
             public void run() {
                 log.append(msg + "\n");
                 log.setCaretPosition(log.getDocument().getLength());
+                LogFilesControl.writeLogFile(tfLogin.getText(), msg);
             }
         });
     }
@@ -170,18 +174,6 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         System.exit(1);
     }
 
-    private void saveLog() {
-        String filename = tfLogin + ".log";
-        File path = new File("src\\geekbrains\\jt\\homework3chat\\" + filename);
-
-        try {
-            PrintStream psToSave = new PrintStream(new FileOutputStream(path));
-            psToSave.println("\n" + log.getText());
-            psToSave.close();
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-    }
 
     /**
      * Socket Thread Listener implementation

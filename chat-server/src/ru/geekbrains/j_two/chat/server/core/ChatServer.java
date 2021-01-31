@@ -73,7 +73,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
 
     @Override
     public void onServerTimeout(ServerSocketThread thread, ServerSocket server) {
-    //    putLog("Server socket thread timeout");
+        //    putLog("Server socket thread timeout");
     }
 
     @Override
@@ -95,7 +95,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
 
     @Override
     public synchronized void onSocketStart(SocketThread thread, Socket socket) {
-       putLog("Socket created");
+        putLog("Socket created");
     }
 
     @Override
@@ -169,7 +169,7 @@ public class ChatServer implements ServerSocketThreadListener, SocketThreadListe
             client.authAccept(nickname);
             if (oldClient == null) {
                 sendToAllAuthorizedClients(Protocol.getTypeBroadcast("Server", nickname + " connected"));
-             } else {
+            } else {
                 oldClient.reconnect();
                 clients.remove(oldClient);
             }

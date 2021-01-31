@@ -5,6 +5,7 @@ import ru.geekbrains.j_two.network.SocketThread;
 import ru.geekbrains.j_two.network.SocketThreadListener;
 
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
 
 public class ClientThread extends SocketThread {
 
@@ -22,8 +23,8 @@ public class ClientThread extends SocketThread {
         close();
     }
 
-    public ClientThread(SocketThreadListener listener, String name, Socket socket) {
-        super(listener, name, socket);
+    public ClientThread(SocketThreadListener listener, String name, Socket socket, ExecutorService executorService) {
+        super(listener, name, socket, executorService);
     }
 
     public String getNickname() {

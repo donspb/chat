@@ -13,6 +13,8 @@ import java.net.Socket;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class ClientGUI extends JFrame implements ActionListener, Thread.UncaughtExceptionHandler, SocketThreadListener {
 
@@ -36,6 +38,8 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     private final JTextField tfMessage = new JTextField();
     private final JButton btnSend = new JButton("Send");
     private final JButton btnRename = new JButton("RenaME");
+
+    private ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     private JScrollPane scrollLog;
     private JScrollPane scrollUsers;
@@ -136,7 +140,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
     private  void connect() {
         try {
             Socket s = new Socket(tfIPAddress.getText(), Integer.parseInt(tfPort.getText()));
-            socketThread = new SocketThread(this, "Client", s);
+            socketThread = new SocketThread(this, "Client", s, executorService);
         } catch (IOException e) {
             e.printStackTrace();
             uncaughtException(Thread.currentThread(), e);
@@ -191,6 +195,7 @@ public class ClientGUI extends JFrame implements ActionListener, Thread.Uncaught
         showLogin(true);
         setTitle(WINDOW_TITLE);
         userList.setListData(new String[0]);
+        executorService.shutdown();
     }
 
     @Override

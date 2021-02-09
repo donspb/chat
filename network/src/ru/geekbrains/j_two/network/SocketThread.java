@@ -4,19 +4,37 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
 
 public class SocketThread extends Thread {
     private final SocketThreadListener listener;
     private final Socket socket;
     private DataOutputStream out;
 
-    public SocketThread(SocketThreadListener listener, String name, Socket socket) {
+    public SocketThread(SocketThreadListener listener, String name, Socket socket, ExecutorService executorService) {
         super(name);
         this.socket = socket;
         this.listener = listener;
-        start();
+        executorService.submit(() -> {
+            try {
+                listener.onSocketStart(this, socket);
+                DataInputStream in = new DataInputStream(socket.getInputStream());
+                out = new DataOutputStream(socket.getOutputStream());
+                listener.onSocketReady(this, socket);
+                while (!isInterrupted()) {
+                    String msg = in.readUTF();
+                    listener.onReceiveString(this, socket, msg);
+                }
+            } catch (IOException e) {
+                listener.onSocketException(this, e);
+                close();
+            } finally {
+                listener.onSocketStop(this);
+            }
+        });
+        //start();
     }
-
+/*
     @Override
     public void run() {
         try {
@@ -35,7 +53,7 @@ public class SocketThread extends Thread {
             listener.onSocketStop(this);
         }
     }
-
+*/
     public synchronized boolean sendMessage(String msg) {
         try {
             out.writeUTF(msg);

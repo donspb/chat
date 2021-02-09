@@ -7,9 +7,15 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 public class ServerGUI extends JFrame implements ActionListener, Thread.UncaughtExceptionHandler,
         ChatServerListener {
+
+    Logger loggy = Logger.getLogger(ServerGUI.class.getName());
+
 
     private static final int WIDTH = 400;
     private static final int HEIGHT = 400;
@@ -32,6 +38,13 @@ public class ServerGUI extends JFrame implements ActionListener, Thread.Uncaught
     }
 
     private ServerGUI() {
+
+        try {
+            LogManager .getLogManager().readConfiguration(ServerGUI.class.getResourceAsStream("logger.prop"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         Thread.setDefaultUncaughtExceptionHandler(this);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setBounds(POS_X, POS_Y, WIDTH, HEIGHT);
@@ -76,6 +89,7 @@ public class ServerGUI extends JFrame implements ActionListener, Thread.Uncaught
             public void run() {
                 log.append(msg + "\n");
                 log.setCaretPosition(log.getDocument().getLength());
+                loggy.info(msg);
             }
         });
     }
